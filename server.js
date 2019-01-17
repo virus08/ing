@@ -37,6 +37,23 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
  
+app.get('/api/emp', function (req, res) {
+    let data = { error: false, data: [], message: 'Emp List' }
+    data.headers = [
+        { text: 'Emp',align: 'left',sortable: true,value: 'Emp_Code'},
+        { text: 'Name',align: 'left',sortable: true, value: 'Name' },
+        { text: 'Surname',align: 'left',sortable: true, value: 'Surname' },
+        { text: 'ProductCount',align: 'left',sortable: true, value: 'ProductCount' }
+
+      ];
+    myRO.query('CALL getEmp()', function (error, results, fields) {
+        if (error) throw error; 
+        data.results = results[0]; 
+        data.xre =  results[1];      
+        return res.send(data);
+    });
+});
+
  // Retrieve all todos 
 app.get('/sections', function (req, res) {
     myRO.query('SELECT DISTINCT Session_Code FROM source', function (error, results, fields) {

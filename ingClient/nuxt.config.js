@@ -3,7 +3,7 @@ module.exports = {
   ** Headers of the page
   */
   head: {
-    title: 'ingclient',
+    title: 'VSTECS Thailand co.,Ltd',
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
@@ -29,14 +29,30 @@ module.exports = {
  /*
  ** Added plugins
  */
-  plugins : ['~/plugins/vuetify'],
+plugins: [
+  '~/plugins/vuetify',
+  '~/plugins/axios' //-- add plugins axios
+],
 
+proxy: {
+  '/api': 'http://127.0.0.1:8000', //-- ตั้งค่า map proxy url api server
+  ws: true
+},
+
+modules: [
+  '@nuxtjs/proxy' //-- add modules proxy 
+],
 
   /*
   ** Build configuration
   */
   build: {
-    vendor : ['vuetify'],
+    vendor: [
+      'jquery', 
+      
+      'vuetify',
+      'vue-axios' //-- add vendor vue-axios
+    ],
     /*
     ** Run ESLint on save
     */

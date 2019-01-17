@@ -290,12 +290,12 @@ DELIMITER //
 CREATE PROCEDURE getEmp()
 BEGIN
    SELECT 
-	Emp_Code,
+	  emp.Emp_Code,
     Name,
     Surname,
     Start_date,
-    GROUP_CONCAT(onhand.Code) as `Code Onhand`, 
-    count(DISTINCT onhand.Code) as `Product Count`
+    GROUP_CONCAT(onhand.Code) as `CodeOnhand`, 
+    count(DISTINCT onhand.Code) as `ProductCount`
    FROM emp left join onhand on emp.Emp_Code= onhand.Emp_Code group by emp.Emp_Code;
 END //
 DELIMITER ;
