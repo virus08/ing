@@ -1,5 +1,16 @@
 <template>
     <div id="wrapper">
+        <nav class="navbar-default navbar-static-side mini-navbar" role="navigation">
+            <div class="sidebar-collapse">
+                <ul class="nav" id="side-menu">
+                    <li class="nav-header">
+                        <div class="logo-element">
+                            IN+
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </nav>
         <div id="page-wrapper" class="gray-bg dashbard-1">
             <div class="row border-bottom">
                 <nav class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0">
@@ -8,7 +19,7 @@
                     </div>
                 </nav>
             </div>
-            <div class="row  border-bottom white-bg dashboard-header">
+            <div class="row border-bottom white-bg dashboard-header">
                 <nuxt/>                        
             </div>
                 <div class="row">
