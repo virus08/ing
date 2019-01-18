@@ -64,6 +64,16 @@ app.get('/api/page/e', function (req, res) {
     return res.send(data);
 });
 
+app.get('/api/page/emp/:id', function (req, res) {
+    let data = { error: false, data: [], message: 'Employee id:'+req.params.id+' Information'  }
+    data.Name="Employee Information"
+    data.Menu = [
+        { text: 'Employee list',value: '/emplists'},
+        { text: 'Pongjakr',value: '/emp/2467/view'}
+      ];   
+    return res.send(data);
+});
+
 app.get('/api/page/emplists', function (req, res) {
     let data = { error: false, data: [], message: 'Page emplists' }
     data.Name="Employee list"

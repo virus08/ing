@@ -6,15 +6,19 @@
       class="elevation-1"
     >
       <template slot="items" slot-scope="props">
-        <td>{{ props.item.Emp_Code}}</td>
+        <td>
+          <nuxt-link :to="'/emp/'+props.item.Emp_Code+'/view'"> 
+            {{ props.item.Emp_Code}}
+          </nuxt-link> 
+        </td>
         <td class="text-xs-left">{{ props.item.Name }}</td>
         <td class="text-xs-left">{{ props.item.Surname }}</td>
         <td class="text-xs-left">{{ props.item.ProductCount }}</td>
         <td class="justify-center layout px-0">
-          <a data-toggle="modal" href="#edit-form"> 
+          <a data-toggle="modal"> 
             <v-icon small class="mr-2">edit </v-icon> 
           </a>
-          <a data-toggle="modal" href="#delete-form"> 
+          <a data-toggle="modal"> 
             <v-icon small class="mr-2">delete </v-icon> 
           </a>
         </td>
