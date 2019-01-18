@@ -54,6 +54,26 @@ app.get('/api/emp', function (req, res) {
     });
 });
 
+app.get('/api/page/e', function (req, res) {
+    let data = { error: false, data: [], message: 'Page e' }
+    data.Name="Employee list"
+    data.Menu = [
+        { text: 'Employee list',value: '/emplists'},
+        { text: 'Pongjakr',value: '/emp/2467/view'}
+      ];   
+    return res.send(data);
+});
+
+app.get('/api/page/emplists', function (req, res) {
+    let data = { error: false, data: [], message: 'Page emplists' }
+    data.Name="Employee list"
+    data.Menu = [
+        { text: 'Employee list',value: '/emplists'},
+        { text: 'Pongjakr',value: '/emp/2467/view'}
+      ];   
+    return res.send(data);
+});
+
  // Retrieve all todos 
 app.get('/sections', function (req, res) {
     myRO.query('SELECT DISTINCT Session_Code FROM source', function (error, results, fields) {

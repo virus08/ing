@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS `fat` (
   `i_Achieve` DECIMAL(5,0),
   `i_GP` DECIMAL(5,0),
   `Incentive` DOUBLE AS (i_GP + i_Achieve),
+  `ProductCount` int,
   `status` tinyint(1) NOT NULL DEFAULT '1',
   `Session_Code` varchar(500) NOT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -155,7 +156,8 @@ INSERT INTO `source` (
 ('VMWare Inc','OV05',40245627.00,8598000.00,468.08,11.1,38493875.84,1751751.16,458000.00,382.48,8.4,5.33,4.35,58,'exec dw.DW_PI.dbo.asp_MTDRevenueByBrand @Begdate=\'01 Dec 2018\',@Enddate=\'31 Dec 2018 23:59:59\',@BndNo=null,@StCode=14161,@SessionStaffCode=14161,@IncludePPBU=0,@AllLocation=0,@Cat1No=null,@DlNo=null,@Promotion=0,@FundConcerned=0,@Official=0'),
 ('VMware VSPP','VPP',1907474.00,1849000.00,103.16,0.53,1567694.02,339779.98,148000.00,229.58,1.63,8,17.81,7,'exec dw.DW_PI.dbo.asp_MTDRevenueByBrand @Begdate=\'01 Dec 2018\',@Enddate=\'31 Dec 2018 23:59:59\',@BndNo=null,@StCode=14161,@SessionStaffCode=14161,@IncludePPBU=0,@AllLocation=0,@Cat1No=null,@DlNo=null,@Promotion=0,@FundConcerned=0,@Official=0'),
 ('XYZ Printing','XYZ',104034.39,2000000.00,5.2,0.03,95569.34,8465.05,160000.00,5.29,0.04,8,8.14,2,'exec dw.DW_PI.dbo.asp_MTDRevenueByBrand @Begdate=\'01 Dec 2018\',@Enddate=\'31 Dec 2018 23:59:59\',@BndNo=null,@StCode=14161,@SessionStaffCode=14161,@IncludePPBU=0,@AllLocation=0,@Cat1No=null,@DlNo=null,@Promotion=0,@FundConcerned=0,@Official=0'),
-('YITU','YITU',0,4167000.00,0,0,0,0,208000.00,0,0,4.99,0,0,'exec dw.DW_PI.dbo.asp_MTDRevenueByBrand @Begdate=\'01 Dec 2018\',@Enddate=\'31 Dec 2018 23:59:59\',@BndNo=null,@StCode=14161,@SessionStaffCode=14161,@IncludePPBU=0,@AllLocation=0,@Cat1No=null,@DlNo=null,@Promotion=0,@FundConcerned=0,@Official=0');
+('YITU','YITU',0,4167000.00,0,0,0,0,208000.00,0,0,4.99,0,0,'exec dw.DW_PI.dbo.asp_MTDRevenueByBrand @Begdate=\'01 Dec 2018\',@Enddate=\'31 Dec 2018 23:59:59\',@BndNo=null,@StCode=14161,@SessionStaffCode=14161,@IncludePPBU=0,@AllLocation=0,@Cat1No=null,@DlNo=null,@Promotion=0,@FundConcerned=0,@Official=0'),
+('Vocollect Inc.','Voco',273900.00,0,0,0.03,257705.66,16194.34,0,0,0.03,0,5.91,1,'exec dw.DW_PI.dbo.asp_MTDRevenueByBrand @Begdate=\'01 Dec 2018\',@Enddate=\'31 Dec 2018 23:59:59\',@BndNo=null,@StCode=14161,@SessionStaffCode=14161,@IncludePPBU=0,@AllLocation=0,@Cat1No=null,@DlNo=null,@Promotion=0,@FundConcerned=0,@Official=0');
 
 
 
@@ -196,9 +198,12 @@ insert into onhand (Emp_Code,Code,Brand)
      ('2467','OV05','VMWare'),
      ('2467','XYZ','XYZ'),
      ('2467','YITU','YITU'),
+     
      ('2018','FJSS','Fujitsu'),
      ('2018','HNW','Honewell'),
      ('2018','OI05','Honewell'),
+	 ('2018','Voco','Honewell'),
+     
      ('2452','Nuta','Nutanix'),
      ('2214','VPL','Veeam'),
      ('2214','OV05','VMWare')
@@ -234,7 +239,8 @@ insert into fat (
   `xGP_Target`,
   `Avg_GP`,
   `Breadth`,
-  `Session_Code`
+  `Session_Code`,
+  `ProductCount`
 )
 select 
   emp.Emp_Code,
@@ -247,6 +253,7 @@ select
   onhand.Code,
   source.Brand_Name,
   onhand.Brand,
+  
   `Sale_Achieve`,
   `GP_Achieve`,
   CASE
@@ -279,13 +286,14 @@ select
   `xGP_Target`,
   `Avg_GP`,
   `Breadth`,
-  `Session_Code`
+  `Session_Code`,
+  emp.bcount
     from emp 
 		left join onhand on emp.Emp_Code= onhand.Emp_Code 
         left join source on onhand.Code = source.Code;
-        
-DROP PROCEDURE IF EXISTS getEmp;
 
+
+DROP PROCEDURE IF EXISTS getEmp;
 DELIMITER //
 CREATE PROCEDURE getEmp()
 BEGIN
