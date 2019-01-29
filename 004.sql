@@ -5,19 +5,56 @@ DROP TABLE IF EXISTS `onhand`;
 DROP TABLE IF EXISTS `fat`;
 DROP table IF EXISTS `brand`;
 DROP table IF EXISTS `m_brand`;
+DROP table IF EXISTS `incentive`;
+
+CREATE TABLE IF NOT EXISTS `incentive` (
+  `id` MEDIUMINT NOT NULL AUTO_INCREMENT,
+  `Emp_Code` varchar (4) NOT NULL,
+  `All_Code` varchar(300) NOT NULL,
+  `All_Brand` varchar(300) NOT NULL,
+  `Brand_Count` int(1) NOT NULL,
+  `All_SaleOut` DECIMAL(19,2) NOT NULL,
+  `All_SaleTarget` DECIMAL(19,2) NOT NULL,
+  `All_GP` DECIMAL(19,2) NOT NULL,
+  `All_GPTaget` DECIMAL(19,2) NOT NULL,
+  `Sales_Achieve` DOUBLE PRECISION as (All_SaleOut/All_SaleTarget*100),
+  `GP_Achieve` DOUBLE PRECISION as (All_GP/All_GPTaget*100),
+  `rule` DECIMAL(5,2) as (case 
+	when Brand_Count = 1 then 80
+    when Brand_Count = 2 then 70
+    else 60
+    end),
+  `factor` DECIMAL(5,2),
+  `Sales_Achieve_In` DECIMAL(19,2) as (Case 
+	when `Sales_Achieve` >= rule and `Sales_Achieve` < 100 then 1500
+    when `Sales_Achieve` >= 100 then 2000
+	else 0
+  end),
+  `GP_Achieve_In`DECIMAL(19,2) as (Case 
+	when GP_Achieve >= rule and GP_Achieve < 100 then 2500
+    when GP_Achieve >= 100 then 3000
+	else 0
+  end),
+  `Incentive` DECIMAL(10,2) as ((Sales_Achieve_In+GP_Achieve_In)*`factor`),
+  `status` tinyint(1) NOT NULL DEFAULT '1',
+  `Session_Code` varchar(500),
+  `Detail` varchar(200),
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8MB4;
 
 CREATE TABLE IF NOT EXISTS `fat` (
   `id` MEDIUMINT NOT NULL AUTO_INCREMENT,
   `Emp_Code` varchar (4) NOT NULL,
-  `Code` varchar(11) NOT NULL,
+  `Code` varchar(11),
   `Name` varchar(100) NOT NULL,
   `Surname` varchar(100) NOT NULL,
   `Position` varchar(100),
   `Division` varchar(100),
   `Thai_name` varchar(200),
   `Start_date` datetime,
-  `Brand_Name` varchar(100) NOT NULL,
-  `Brand` varchar(100) NOT NULL,
+  `Brand_Name` varchar(100),
+  `Brand` varchar(100),
   `Sales_Out` DECIMAL(11,2),
   `Target` DECIMAL(11,2),
   `Sale_Achieve` DECIMAL(11,2),
@@ -30,12 +67,9 @@ CREATE TABLE IF NOT EXISTS `fat` (
   `xGP_Target` DECIMAL(11,2),
   `Avg_GP` DECIMAL(5,2),
   `Breadth` DECIMAL(5,0),
-  `i_Achieve` DECIMAL(5,0),
-  `i_GP` DECIMAL(5,0),
-  `Incentive` DOUBLE AS (i_GP + i_Achieve),
   `ProductCount` int,
   `status` tinyint(1) NOT NULL DEFAULT '1',
-  `Session_Code` varchar(500) NOT NULL,
+  `Session_Code` varchar(500),
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8MB4;
@@ -54,7 +88,7 @@ CREATE TABLE IF NOT EXISTS `onhand` (
 CREATE TABLE IF NOT EXISTS `m_brand` (
   `id` MEDIUMINT NOT NULL AUTO_INCREMENT,
   `Brand` varchar(100) NOT NULL,
-  `Name` varchar(100),
+  `Code` varchar(100),
   `status` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
@@ -123,11 +157,29 @@ INSERT INTO `emp` (
   ('2467','Pongjakr','Hiranpiyawit','Technical Manager','Enterprise Systems','พงศ์จักร  หิรัญปิยวิทย์ (แซท)','2017-06-1 00:00:00'),
   ('2018','Sirichate','Thawornsuk','Senior Pre-sales Engineer','Enterprise Systems','ศิริเชษฐ์  ถาวรสุข (เชษฐ์) ','2017-06-1 00:00:00'),
   ('2452','Thanetrat','Suphapakorn','Pre-sales Engineer Professional 2','Enterprise Systems','ธเนศรัตน์ ศุภภากร (เหียน)','2017-01-1 00:00:00'),
-  ('2214','Worapan','Kosalwat','Pre-sales Engineer 1','Enterprise Systems','วรพรรณ  โกศัลวัฒน์  (ฝ้าย)','2017-01-1 00:00:00');
+  ('2214','Worapan','Kosalwat','Pre-sales Engineer 1','Enterprise Systems','วรพรรณ  โกศัลวัฒน์  (ฝ้าย)','2017-01-1 00:00:00'),
+  ('2516','Nuttapon','Thirapiwat','Pre-sales Engineer','Enterprise Systems','ณัฐพล ถิราภิวัฒน์ (แมน)','2017-01-1 00:00:00'),
+  ('2489','Wuttichai','Wongampornpisit','Pre-sales Engineer','Enterprise Systems','วุฒิชัย วงศ์อัมพรพิสิฐ (ตาว)','2017-01-1 00:00:00'),
+  ('2457','Phanupun','Yamklib','Pre-sales Engineer','Enterprise Systems','ภาณุพันธ์  แย้มกลีบ (คิม)','2017-01-1 00:00:00'),
+  ('1730','Chalermporn','Buntalar','Pre-sales Engineer','Enterprise Systems','เฉลิมพร  บุญตาหล้า (เอ) ','2017-01-1 00:00:00'),
+  ('1877','Tanakiat','Waradetjumroen','Pre-sales Engineer','Enterprise Systems','ธนเกียรติ   วรเดชจำเริญ  (บอส)','2017-01-1 00:00:00'),
+  ('2149','Arnon','Chetsadapongpakdee','Pre-sales Engineer','Enterprise Systems','อานนท์ เจษฎาพงศ์ภักดี (เอก)','2017-01-1 00:00:00'),
+  ('2460','Watchara','Prasittiwiset','Pre-sales Engineer','Enterprise Systems','วัชระ  ประสิทธิวิเศษ (ฟิน)','2017-01-1 00:00:00'),
+  ('2481','Tanatip','Boonyakida','Pre-sales Engineer','Enterprise Systems','ธนธิป บุณยกิดา (ท็อป)','2017-01-1 00:00:00'),
+  ('1905','Yuttapon','Paitoonrungsalit','Pre-sales Engineer','Enterprise Systems','ยุทธพล ไพฑูรย์รังสฤษดิ์ (ต็อป)','2017-01-1 00:00:00'),
+  ('2555','Kanaet','Sirimayurachart','Pre-sales Engineer','Enterprise Systems','คเณศ ศิริมยุรฉัตร  (แฟล็ซ)','2017-01-1 00:00:00'),
+  ('2528','Puttipong','Singkharach','Pre-sales Engineer','Enterprise Systems','พุฒิพงศ์ สิงฆราช (เอ็ม)','2017-01-1 00:00:00'),  
+  ('2561','Panu','Putjaroen','Pre-sales Engineer','Enterprise Systems','ภาณุ พุตเจริญ (แจ้)','2017-01-1 00:00:00'),
+  ('2741','Yodying','Laksameekarnkhar','Pre-sales Engineer','Enterprise Systems','ยอดยิ่ง ลักษมีการค้า (ยอด)','2017-01-1 00:00:00'),
+  ('2734','Thavikorn','Vongsayun','Pre-sales Engineer','Enterprise Systems','ฐาวิกรณ์ วงษ์สายันต์   (บีม)','2017-01-1 00:00:00'),  
+  ('2435','Wanchai','Fuangmali','Pre-sales EngineerProfessional 1','Enterprise Systems','วันชัย เฟื่องมะลิ ','2017-01-1 00:00:00'),
+  ('2780','Natthawut','Saengarunphaisan','Pre-sales Engineer','Enterprise Systems','ณัฐวุฒิ แสงอรุณไพศาล  (แพค)','2017-01-1 00:00:00'),
+  ('2817','Netpavee','Siriwichwattana','Pre-sales Engineer','Enterprise Systems','เนตรปวีร์ ศิริวิชญ์วัฒนา (นาว)','2017-01-1 00:00:00')  
+;
 
 insert into  brand(Code,Brand)
 	 VALUES 
-    ('Aris','Arista'),
+     ('Aris','Arista'),
      ('DLET','Dell'),
      ('EMC','EMC'),
      ('F5','F5'),
@@ -223,6 +275,7 @@ insert into onhand (Emp_Code,Code,Brand)
 	 VALUES 
      ('2467','Aris','Arista'),
      ('2467','DLET','Dell'),
+     ('2467','DOEM','Dell'),
      ('2467','EMC','EMC'),
      ('2467','F5','F5'),
      ('2467','Fire','FireEye'),
@@ -251,8 +304,10 @@ insert into onhand (Emp_Code,Code,Brand)
      ('2467','VPL','Veeam'),
      ('2467','VRTS','Veritas'),
      ('2467','OV05','VMWare'),
+     ('2467','VPP','VMWare'),
      ('2467','XYZ','XYZ'),
      ('2467','YITU','YITU'),
+
      
      ('2018','FJSS','Fujitsu'),
      ('2018','HNW','Honewell'),
@@ -261,11 +316,55 @@ insert into onhand (Emp_Code,Code,Brand)
      
      ('2452','Nuta','Nutanix'),
      ('2214','VPL','Veeam'),
-     ('2214','OV05','VMWare')
+     ('2214','OV05','VMWare'),
+     
+     ('2516','HUA','Huawei Enterprise'),
+     ('2457','HUA','Huawei Enterprise'),
+     ('1730','HUA','Huawei Enterprise'),
+     ('2489','EMC','EMC'),
+     
+     ('1877','OV05','VMWare'),
+     ('1877','VPL','Veeam'),
+     
+     ('2149','Clou','Microsoft'),
+     ('2149','VPP','VMWare'),
+     ('2149','MSCS','Microsoft'),
+     ('2149','SYMT','Symantec'),
+     ('2149','VPL','Veeam'),
+
+     ('2460','Clou','Microsoft'),
+     ('2460','VPP','VMWare'),
+     ('2460','MSCS','Microsoft'),
+     ('2460','SYMT','Symantec'),
+     ('2460','VPL','Veeam'),
+     
+     ('2481','NetA','NetApp'),
+     
+     ('1905','SYMT','Symantec'),
+     ('1905','SMNT','Symantec'),
+     
+     ('2780','SYMT','Symantec'),
+     ('2780','SMNT','Symantec'),
+          
+     ('2555','VRTS','Veritas'),
+     ('2555','OV05','VMWare'),
+     
+     ('2528','EMC','EMC'),
+     ('2528','VRTS','Veritas'),
+     
+     ('2561','FPJ','Fortinet'),
+     ('2561','FNET','Fortinet'),
+     
+     ('2741','F5','F5'),
+     
+     ('2734','Aris','Arista'),
+     
+     ('2435','ORL','Oracle'),
+     ('2817','ORL','Oracle') 
 ;
 
-insert into m_brand (Brand,Name)
-	select distinct(Brand),Brand from onhand;
+insert into m_brand (Brand,Code)
+	select Brand ,code from onhand group by code;
     
 UPDATE emp
   SET bcount = (select count(distinct Brand) from onhand where emp.Emp_Code = onhand.Emp_Code) where emp.id > 0; 
@@ -283,8 +382,6 @@ insert into fat (
   `Brand`,
   `Sale_Achieve`,
   `GP_Achieve`,
-  `i_Achieve`,
-  `i_GP`,
   `Start_date`,
   `Sales_Out`,
   `Target`,
@@ -313,28 +410,9 @@ select
   
   `Sale_Achieve`,
   `GP_Achieve`,
-  CASE
-		WHEN source.Sale_Achieve > 1 and source.Sale_Achieve < 99  THEN 1500
-        WHEN source.Sale_Achieve > 100 and source.Sale_Achieve < 109  THEN 2000
-        WHEN source.Sale_Achieve > 110 and source.Sale_Achieve < 119  THEN 3000
-        WHEN source.Sale_Achieve > 120 and source.Sale_Achieve < 139  THEN 4000
-        WHEN source.Sale_Achieve > 140 and source.GP_Achieve < 80 THEN 4000 
-        WHEN source.Sale_Achieve > 140 and source.GP_Achieve > 80 THEN 5000 
-		ELSE 0
-	END as `i_Achieve`,
-        CASE
-		WHEN source.GP_Achieve > 1 and source.Sale_Achieve < 99  THEN 2500
-        WHEN source.GP_Achieve > 100 and source.Sale_Achieve < 109  THEN 3000
-        WHEN source.GP_Achieve > 110 and source.Sale_Achieve < 119  THEN 3500
-        WHEN source.GP_Achieve > 120 and source.Sale_Achieve < 139  THEN 5000
-        WHEN source.GP_Achieve > 140 THEN 6000
-		ELSE 0
-	END as   `i_GP`,
-
   `Start_date`,
   `Sales_Out`,
   `Target`,
-
   `Sale_Contribution`,
   `Total_Cost`,
   `GP`,
@@ -348,6 +426,35 @@ select
     from emp 
 		left join onhand on emp.Emp_Code= onhand.Emp_Code 
         left join source on onhand.Code = source.Code;
+
+INSERT INTO `rest`.`incentive` (
+	`Emp_Code`, 
+    `All_Code`, 
+    `All_Brand`, 
+    `Brand_Count`, 
+    `All_SaleOut`, 
+    `All_SaleTarget`, 
+    `All_GP`, 
+    `All_GPTaget`, 
+    `factor`,
+    `status`, 
+    `Session_Code`,
+    `Detail`
+) 
+	select 
+    `Emp_Code`, 
+    group_concat(Code) as `All_Code`, 
+    group_concat(distinct Brand) as `All_Brand`, 
+    count(distinct Brand) as `Brand_Count`, 
+    round((sum(Sales_Out)),2) as `All_SaleOut`, 
+    round((sum(Target)),2) as `All_SaleTarget`, 
+    sum(GP) as `All_GP`, 
+    sum(GP_Target) as `All_GPTaget`, 
+    (1) as `factor`,
+    (1) as `status`, 
+    `Session_Code`,
+    Concat('Incentive Achieve (',Session_Code,')') as `Detail` from fat
+    group by Emp_Code;
 
 
 DROP PROCEDURE IF EXISTS getEmplist;

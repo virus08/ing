@@ -1,7 +1,16 @@
+require('rootpath')();
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const mysql = require('mysql'); 
+// var session = require('express-session');
+//* Add Header 
+const cors = require('cors');
+const basicAuth = require('_helpers/basic-auth');
+const errorHandler = require('_helpers/error-handler');
+
+// var flash = require('connect-flash');
+
 require('dotenv').config()
 
 /*  env 
@@ -13,6 +22,14 @@ DB_PASS=
 DB_NAME=rest
 APP_HOST=0.0.0.0
 APP_PORT=8000
+OAUTH_APP_ID=54f59231-4d59-424a-aa93-06dbc90cb80e
+OAUTH_APP_PASSWORD=X7bgzonV/bqZxdrM4ov2M3FPvjk56f4XQV4OzMC2Ox0=
+OAUTH_REDIRECT_URI=http://localhost:3000/auth/callback
+OAUTH_SCOPES='profile offline_access user.read calendars.read'
+OAUTH_AUTHORITY=https://login.microsoftonline.com/common
+OAUTH_ID_METADATA=/v2.0/.well-known/openid-configuration
+OAUTH_AUTHORIZE_ENDPOINT=/oauth2/v2.0/authorize
+OAUTH_TOKEN_ENDPOINT=/oauth2/v2.0/token
 */
 const myRW = mysql.createConnection({
     host: process.env.DB_HOST,
@@ -36,107 +53,23 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: true
 }));
- 
-app.get('/api/emp', function (req, res) {
-    let data = { error: false, data: [], message: 'Emp List' }
-    data.headers = [
-        { text: 'Emp',align: 'left',sortable: true,value: 'Emp_Code'},
-        { text: 'Name',align: 'left',sortable: true, value: 'Name' },
-        { text: 'Surname',align: 'left',sortable: true, value: 'Surname' },
-        { text: 'ProductCount',align: 'left',sortable: true, value: 'ProductCount' }
-
-      ];
-    myRO.query('CALL getEmp()', function (error, results, fields) {
-        if (error) throw error; 
-        data.results = results[0]; 
-        data.xre =  results[1];      
-        return res.send(data);
-    });
-});
-
-app.get('/api/page/e', function (req, res) {
-    let data = { error: false, data: [], message: 'Page e' }
-    data.Name="Employee list"
-    data.Menu = [
-        { text: 'Employee list',value: '/emplists'},
-        { text: 'Pongjakr',value: '/emp/2467/view'}
-      ];   
-    return res.send(data);
-});
-
-app.get('/api/page/emp/:id', function (req, res) {
-    let data = { error: false, data: [], message: 'Employee id:'+req.params.id+' Information'  }
-    data.Name="Employee Information"
-    data.Menu = [
-        { text: 'Employee list',value: '/emplists'},
-        { text: 'Pongjakr',value: '/emp/2467/view'}
-      ];   
-    return res.send(data);
-});
-
-app.get('/api/page/emplists', function (req, res) {
-    let data = { error: false, data: [], message: 'Page emplists' }
-    data.Name="Employee list"
-    data.Menu = [
-        { text: 'Employee list',value: '/emplists'},
-        { text: 'Pongjakr',value: '/emp/2467/view'}
-      ];   
-    return res.send(data);
-});
-
- // Retrieve all todos 
-app.get('/sections', function (req, res) {
-    myRO.query('SELECT DISTINCT Session_Code FROM source', function (error, results, fields) {
-        if (error) throw error;
-        return res.send({ error: false, data: results, message: 'Sections' });
-    });
-});
-
-app.get('/emp', function (req, res) {
-    myRO.query('CALL getEmp()', function (error, results, fields) {
-        if (error) throw error;        
-        return res.send({ error: false, data: results, message: 'Emp List' });
-    });
-});
-
-app.get('/listonhand', function (req, res) {
-    myRO.query('SELECT emp.Emp_Code,Name,Surname,Start_date,GROUP_CONCAT(onhand.Code) as `Code Onhand`, count(DISTINCT onhand.Code) as `Product Count` FROM emp left join onhand on emp.Emp_Code= onhand.Emp_Code group by emp.Emp_Code;', function (error, results, fields) {
-        if (error) throw error;        
-        return res.send({ error: false, data: results, message: 'Emp List' });
-    });
-});
 
 
-
-app.get('/Brand', function (req, res) {
-    myRO.query('SELECT DISTINCT Code, Brand_Name FROM source', function (error, results, fields) {
-        if (error) throw error;
-        return res.send({ error: false, data: results, message: 'Brand_Name' });
-    });
-});
-
-
-
-
-app.get('/Source/search/:keyword', function (req, res) {
-    let keyword = req.params.keyword;
-    myRO.query("SELECT * FROM rest.source WHERE Session_Code LIKE ? ", ['%' + keyword + '%'], function (error, results, fields) {
-        if (error) throw error;
-        return res.send({ error: false, data: results, message: 'Todos search list.' });
-    });
-});
-
-// default route
+app.use(cors());
 app.get('/', function (req, res) {
-    return res.send({ error: true, message: 'hello' })
+    return res.send({ error: false, message: 'hello' })
 });
- 
+
+app.use(basicAuth);
+app.use('/users', require('./users/users.controller'));
+app.use('/api', require('./dataservice/api'));
+app.use(errorHandler);
+
 // all other requests redirect to 404
 app.all("*", function (req, res, next) {
     return res.send({ error: true, message: 'Page Not Found' });
     next();
 });
-
 // port must be set to 8080 because incoming http requests are routed from port 80 to port 8080
 app.listen(process.env.APP_PORT, function () {
     console.log('Node app is running on port: '+ process.env.APP_PORT); 
