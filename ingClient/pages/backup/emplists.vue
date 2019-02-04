@@ -13,9 +13,6 @@
         </td>
         <td class="text-xs-left">{{ props.item.Name }}</td>
         <td class="text-xs-left">{{ props.item.Surname }}</td>
-        <td class="text-xs-left">{{ props.item.Position }}</td>
-        <td class="text-xs-left">{{ props.item.Division }}</td>
-        <td class="text-xs-left">{{ props.item.Thai_name }}</td>
         <td class="text-xs-left">{{ props.item.ProductCount }}</td>
         <td class="justify-center layout px-0">
           <a data-toggle="modal"> 
@@ -110,17 +107,7 @@ export default {
       drawer: null,
       name: '',
       detail:'ข้อมูลพนักงาน',
-      headers: [
-        { text: 'Emp',align: 'left',sortable: true,value: 'Emp_Code'},
-        { text: 'Name',align: 'left',sortable: true, value: 'Name' },
-        { text: 'Surname',align: 'left',sortable: true, value: 'Surname' },
-        { text: 'Position',align: 'left',sortable: true, value: 'Position' },
-        { text: 'Division',align: 'left',sortable: true, value: 'Division' },
-        { text: 'Thai Name',align: 'left',sortable: true, value: 'Thai_name' },
-        { text: 'ProductCount',align: 'left',sortable: true, value: 'ProductCount' },
-        { text: 'Actions', "align": "center", value: 'name', sortable: false }
-
-      ],
+      headers: [],
       desserts:[]
     }
   },
@@ -128,9 +115,10 @@ export default {
     console.log('App created')
     let res = await this.$http.get('/emp')
     console.log(res.data)
-    //this.name = res.data.message;
-    //this.headers = res.data.headers;
-    this.desserts = res.data;
+    this.name = res.data.message;
+    this.headers = res.data.headers;
+    this.desserts = res.data.results;
+    this.headers.push({ text: 'Actions', "align": "center", value: 'name', sortable: false })
   }
 }
 </script>

@@ -53,24 +53,20 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: true
 }));
-
-
 app.use(cors());
 app.get('/', function (req, res) {
     return res.send({ error: false, message: 'hello' })
 });
-
 app.use(basicAuth);
-app.use('/users', require('./users/users.controller'));
 app.use('/api', require('./dataservice/api'));
+app.use('/users', require('./users/users.controller'));
 app.use(errorHandler);
 
-// all other requests redirect to 404
 app.all("*", function (req, res, next) {
     return res.send({ error: true, message: 'Page Not Found' });
     next();
 });
-// port must be set to 8080 because incoming http requests are routed from port 80 to port 8080
+
 app.listen(process.env.APP_PORT, function () {
     console.log('Node app is running on port: '+ process.env.APP_PORT); 
 });

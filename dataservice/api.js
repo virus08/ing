@@ -2,10 +2,13 @@ const express = require('express');
 const router = express.Router();
 const userService = require('../users/user.service');
 const empService = require('./emp.service');
+
 // routes
 router.post('/authenticate', authenticate);
 router.get('/users', getUsers);
 router.get('/emp', getEmps);
+
+
 
 
 module.exports = router;

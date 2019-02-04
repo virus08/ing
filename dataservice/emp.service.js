@@ -17,7 +17,7 @@ myRO.query('call getEmp()', function (error, results, fields) {
     results[0].forEach(function(e) {
         empdata.push(e);
     });
-    console.log(empdata);
+    //console.log(empdata);
 });
 
 module.exports = {
