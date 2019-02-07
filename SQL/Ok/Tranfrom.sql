@@ -4,7 +4,7 @@ create view SumByProduct_at_july as
     sum(Price_After_Discount) as `Sales_Out`,
     sum(GP) as `GP`
 from datain 
-	where Invoice_Date BETWEEN '2018-07-01' AND '2018-07-31'
+	where Invoice_Date BETWEEN '2018-09-01' AND '2018-09-30'
 group by `Brand_Name` order by `Brand_Name` ;
     
 DROP view if exists SalesByProduct_at_july;
@@ -85,8 +85,8 @@ from xemp as x
 group by x.id;
 
 
-drop view if exists info_by_emp;
-create view info_by_emp as 
+drop view if exists 0_info_by_emp;
+create view 0_info_by_emp as 
 select
 	e.id as `id`,
 	e.Emp_Code as Emp_Code,

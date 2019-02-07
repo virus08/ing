@@ -1,3 +1,4 @@
+use ing;
 SET block_encryption_mode = 'aes-256-cbc';
 SET @key_str = SHA2('My secret passphrase',512);
 
